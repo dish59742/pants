@@ -110,11 +110,6 @@ jobs:
         ./cargo test --all --tests -- --nocapture
         '
 
-    strategy:
-      matrix:
-        python-version:
-        - '3.7'
-    timeout-minutes: 40
   build_wheels_linux:
     container: quay.io/pypa/manylinux2014_x86_64:latest
     env:
@@ -231,6 +226,94 @@ jobs:
         name: pants-log-lint
         path: .pants.d/pants.log
     
+  test-aarch64:
+    name: "Test ${{ matrix.pyver }} aarch64"
+    strategy:
+      matrix:
+        pyver: [cp36-cp36m, cp37-cp37m, cp38-cp38, cp39-cp39]
+        arch: [aarch64]
+    runs-on: ubuntu-latest
+    env:
+      py: /opt/python/${{ matrix.pyver }}/bin/python
+      img: quay.io/pypa/manylinux2014_${{ matrix.arch }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Set up QEMU
+      id: qemu
+      uses: docker/setup-qemu-action@v1
+    - name: Set up Python ${{ matrix.pyver }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.pyver }}
+    - name: Cache Rust toolchain
+      uses: actions/cache@v2
+      with:
+        key: ${{ runner.os }}-rustup-${{ hashFiles('rust-toolchain') }}
+        path: '~/.rustup/toolchains/beta-2021-04-07-*
+          ~/.rustup/update-hashes
+          ~/.rustup/settings.toml
+          '
+    - name: Cache Cargo
+      uses: actions/cache@v2
+      with:
+        key: '${{ runner.os }}-cargo-${{ hashFiles(''rust-toolchain'') }}-${{ hashFiles(''src/rust/engine/Cargo.*'')
+          }}
+          '
+        path: '~/.cargo/registry
+          ~/.cargo/git
+          '
+        restore-keys: '${{ runner.os }}-cargo-${{ hashFiles(''rust-toolchain'') }}-
+          '
+    - name: Cache Pants Virtualenv
+      uses: actions/cache@v2
+      with:
+        key: '${{ runner.os }}-pants-venv-${{ matrix.python-version }}-${{ hashFiles(''pants/3rdparty/python/**'',
+          ''pants.toml'') }}
+          '
+        path: '~/.cache/pants/pants_dev_deps'
+    - id: get-engine-hash
+      name: Get Engine Hash
+      run: 'echo "::set-output name=hash::$(./build-support/bin/rust/print_engine_hash.sh)"
+        '
+      shell: bash
+    - name: Cache Native Engine
+      uses: actions/cache@v2
+      with:
+        key: '${{ runner.os }}-engine-${{ steps.get-engine-hash.outputs.hash }}'
+        path: 'src/python/pants/engine/internals/native_engine.so
+          src/python/pants/engine/internals/native_engine.so.metadata'
+    - name: Bootstrap Pants
+      run: './pants --version'
+    - name: Run smoke tests
+      run: './pants list ::
+        ./pants roots
+        ./pants help goals
+        ./pants help targets
+        ./pants help subsystems
+        '
+    - name: Upload pants.log
+      uses: actions/upload-artifact@v2
+      with:
+        name: pants-log-bootstrap-linux
+        path: .pants.d/pants.log
+    - name: Upload native_engine.so
+      uses: actions/upload-artifact@v2
+      with:
+        name: native_engine.so.${{ matrix.python-version }}.${{ runner.os }}
+        path: 'src/python/pants/engine/internals/native_engine.so
+          src/python/pants/engine/internals/native_engine.so.metadata'    
+    - name: Install dependencies
+      run: |
+            docker run --rm -v ${{ github.workspace }}:/ws:rw --workdir=/ws \
+            ${{ env.img }} \
+            bash -exc '${{ env.py }} -m pip install virtualenv && ${{ env.py }} -m venv .env && \
+            source .env/bin/activate && \
+            sudo yum install -y pkgconfig fuse fuse-devel && \
+            ./cargo clippy --all && \
+            ./cargo test --all --tests -- --nocapture && \
+            deactivate'
+
 name: Pull Request CI
 'on':
 - push
