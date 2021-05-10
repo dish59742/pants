@@ -263,7 +263,7 @@ jobs:
         - '3.7'
     timeout-minutes: 40
   build_wheels_linux:
-    container: quay.io/pypa/manylinux2014_x86_64:latest
+    container: quay.io/pypa/manylinux2014_aarch64:latest
     env:
       PANTS_REMOTE_CACHE_READ: 'false'
       PANTS_REMOTE_CACHE_WRITE: 'false'
@@ -313,11 +313,11 @@ jobs:
       name: Build wheels and fs_util
       run: '[[ "${GITHUB_EVENT_NAME}" == "pull_request" ]] && export MODE=debug
 
-        ./build-support/bin/release.sh -n
+        ./build-support/bin/release.sh -q
 
-        USE_PY38=true ./build-support/bin/release.sh -n
+        USE_PY38=true ./build-support/bin/release.sh -q
 
-        USE_PY39=true ./build-support/bin/release.sh -n
+        USE_PY39=true ./build-support/bin/release.sh -q
 
         ./build-support/bin/release.sh -f
 
