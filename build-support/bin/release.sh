@@ -11,7 +11,7 @@ source "${ROOT}/build-support/common.sh"
 
 # TODO: make this less hacky when porting to Python 3. Use proper `--python-version` flags, like
 #  those used by ci.py.
-
+py_major_minor=/opt/python/cp37-cp37m/bin/python -c 'import sys; print(".".join(map(str, sys.version_info[0:2])))'
 function run_packages_script() {
   (
     cd "${ROOT}"
