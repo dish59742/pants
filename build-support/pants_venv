@@ -16,7 +16,7 @@ REQUIREMENTS=(
 venv_dir_prefix="${HOME}/.cache/pants/pants_dev_deps/$(uname)"
 
 function venv_dir() {
-  /opt/python/cp37-cp37m/bin/python -c \'import sys; print("".join(map(str, sys.version_info[0:2])))\')
+  /opt/python/cp37-cp37m/bin/python -c \'import sys; print(".".join(map(str, sys.version_info[0:2])))\')
   #echo "${venv_dir_prefix}.py${py_venv_version}.venv"
 }
 
