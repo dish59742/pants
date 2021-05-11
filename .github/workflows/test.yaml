@@ -330,7 +330,7 @@ jobs:
               mkdir -p /github/home/.cache/pip;
               chown -R $(whoami) /github/home/.cache;
               /opt/python/${{ matrix.PYTHON.VERSION }}/bin/python -m venv .venv;
-              echo "::set-output name=hash::$(./build-support/bin/rust/print_engine_hash.sh)";
+              echo \"::set-output name=hash::$(./build-support/bin/rust/print_engine_hash.sh)\";
               ./pants --version;
               ./pants list ::;
               ./pants roots;
