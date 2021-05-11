@@ -11,30 +11,6 @@ source "${ROOT}/build-support/common.sh"
 
 # TODO: make this less hacky when porting to Python 3. Use proper `--python-version` flags, like
 #  those used by ci.py.
-if [[ "${USE_PY38:-false}" == "true" ]]; then
-  default_python=python3.8
-  interpreter_constraint="==3.8.*"
-elif [[ "${USE_PY39:-false}" == "true" ]]; then
-  default_python=python3.9
-  interpreter_constraint="==3.9.*"
-else
-  default_python=cp37-cp37m
-  interpreter_constraint="==3.7.*"
-fi
-
-export PY="${PY:-${default_python}}"
-if ! command -v "${PY}" > /dev/null; then
-  die "Python interpreter ${PY} not discoverable on your PATH."
-fi
-py_major_minor=$(${PY} -c 'import sys; print(".".join(map(str, sys.version_info[0:2])))')
-if [[ "${py_major_minor}" != "cp37-cp37m" && "${py_major_minor}" != "3.8" && "${py_major_minor}" != "3.9" ]]; then
-  die "Invalid interpreter. The release script requires Python 3.7, 3.8, or 3.9 (you are using ${py_major_minor})."
-fi
-
-# This influences what setuptools is run with, which determines the interpreter used for building
-# `pantsbuild.pants`. It also influences what package.py is run with, which determines which Python is used to create
-# a temporary venv to build 3rdparty wheels.
-export PANTS_PYTHON_SETUP_INTERPRETER_CONSTRAINTS="['${interpreter_constraint}']"
 
 function run_packages_script() {
   (
