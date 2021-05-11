@@ -254,7 +254,7 @@ jobs:
             ./build-support/bin/release.sh -q && \
             USE_PY38=true ./build-support/bin/release.sh -q && \
             USE_PY39=true ./build-support/bin/release.sh -q && \
-            ./build-support/bin/release.sh -f && \'
+            ./build-support/bin/release.sh -f'
             #deactivate'
 
 name: Pull Request CI
