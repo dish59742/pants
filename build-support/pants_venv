@@ -16,8 +16,8 @@ REQUIREMENTS=(
 venv_dir_prefix="${HOME}/.cache/pants/pants_dev_deps/$(uname)"
 
 function venv_dir() {
-  py_venv_version=$(${PY} -c 'import sys; print("".join(map(str, sys.version_info[0:2])))')
-  echo "${venv_dir_prefix}.py${py_venv_version}.venv"
+  .venv/bin/python -c "import sys; print("".join(map(str, sys.version_info[0:2])))")
+  #echo "${venv_dir_prefix}.py${py_venv_version}.venv"
 }
 
 function activate_venv() {
@@ -29,7 +29,7 @@ function activate_venv() {
 
 function create_venv() {
   rm -rf "$(venv_dir)"
-  "${PY}" -m venv "$(venv_dir)" && "$(venv_dir)/bin/pip" install wheel
+  .venv/bin/python -m venv "$(venv_dir)" && "$(venv_dir)/bin/pip" install wheel
 }
 
 function ensure_gcc() {
