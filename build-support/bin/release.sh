@@ -18,7 +18,7 @@ elif [[ "${USE_PY39:-false}" == "true" ]]; then
   default_python=python3.9
   interpreter_constraint="==3.9.*"
 else
-  default_python=python3.7
+  default_python=cp37-cp37m
   interpreter_constraint="==3.7.*"
 fi
 
@@ -27,7 +27,7 @@ if ! command -v "${PY}" > /dev/null; then
   die "Python interpreter ${PY} not discoverable on your PATH."
 fi
 py_major_minor=$(${PY} -c 'import sys; print(".".join(map(str, sys.version_info[0:2])))')
-if [[ "${py_major_minor}" != "3.7" && "${py_major_minor}" != "3.8" && "${py_major_minor}" != "3.9" ]]; then
+if [[ "${py_major_minor}" != "cp37-cp37m" && "${py_major_minor}" != "3.8" && "${py_major_minor}" != "3.9" ]]; then
   die "Invalid interpreter. The release script requires Python 3.7, 3.8, or 3.9 (you are using ${py_major_minor})."
 fi
 
