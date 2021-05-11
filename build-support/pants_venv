@@ -29,7 +29,7 @@ function activate_venv() {
 
 function create_venv() {
   rm -rf "$(venv_dir)"
-  .venv/bin/python -m venv "$(venv_dir)" && "$(venv_dir)/bin/pip" install wheel
+  /opt/python/cp37-cp37m/bin/python -m venv "$(venv_dir)" && "$(venv_dir)/bin/pip" install wheel
 }
 
 function ensure_gcc() {
