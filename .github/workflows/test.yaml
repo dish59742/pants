@@ -227,7 +227,7 @@ jobs:
         path: .pants.d/pants.log
     
   test-aarch64:
-    name: "Test ${{ matrix.pyver }} aarch64"
+    name: "Test ${{ matrix.pyver }} aarch64 build wheel"
     strategy:
       matrix:
         pyver: [cp36-cp36m, cp37-cp37m, cp38-cp38, cp39-cp39]
@@ -236,124 +236,27 @@ jobs:
     env:
       py: /opt/python/${{ matrix.pyver }}/bin/python
       img: quay.io/pypa/manylinux2014_${{ matrix.arch }}
+      PANTS_REMOTE_CACHE_READ: 'false'
+      PANTS_REMOTE_CACHE_WRITE: 'false'
     steps:
     - name: Checkout
       uses: actions/checkout@v2
     - name: Set up QEMU
       id: qemu
       uses: docker/setup-qemu-action@v1
-    - name: Cache Rust toolchain
-      uses: actions/cache@v2
-      with:
-        key: ${{ runner.os }}-rustup-${{ hashFiles('rust-toolchain') }}
-        path: '~/.rustup/toolchains/beta-2021-04-07-*
-          ~/.rustup/update-hashes
-          ~/.rustup/settings.toml
-          '
-    - name: Cache Cargo
-      uses: actions/cache@v2
-      with:
-        key: '${{ runner.os }}-cargo-${{ hashFiles(''rust-toolchain'') }}-${{ hashFiles(''src/rust/engine/Cargo.*'')
-          }}
-          '
-        path: '~/.cargo/registry
-          ~/.cargo/git
-          '
-        restore-keys: '${{ runner.os }}-cargo-${{ hashFiles(''rust-toolchain'') }}-
-          '
-    - name: Cache Pants Virtualenv
-      uses: actions/cache@v2
-      with:
-        key: '${{ runner.os }}-pants-venv-${{ matrix.python-version }}-${{ hashFiles(''pants/3rdparty/python/**'',
-          ''pants.toml'') }}
-          '
-        path: '~/.cache/pants/pants_dev_deps'
-    - id: get-engine-hash
-      name: Get Engine Hash
-      run: 'echo "::set-output name=hash::$(./build-support/bin/rust/print_engine_hash.sh)"
-        '
-      shell: bash
-    - name: Cache Native Engine
-      uses: actions/cache@v2
-      with:
-        key: '${{ runner.os }}-engine-${{ steps.get-engine-hash.outputs.hash }}'
-        path: 'src/python/pants/engine/internals/native_engine.so
-          src/python/pants/engine/internals/native_engine.so.metadata'
-    - name: Bootstrap Pants
-      run: './pants --version'
-    - name: Run smoke tests
-      run: './pants list ::
-        ./pants roots
-        ./pants help goals
-        ./pants help targets
-        ./pants help subsystems
-        '
-    - name: Upload pants.log
-      uses: actions/upload-artifact@v2
-      with:
-        name: pants-log-bootstrap-linux
-        path: .pants.d/pants.log
-    - name: Upload native_engine.so
-      uses: actions/upload-artifact@v2
-      with:
-        name: native_engine.so.${{ matrix.python-version }}.${{ runner.os }}
-        path: 'src/python/pants/engine/internals/native_engine.so
-          src/python/pants/engine/internals/native_engine.so.metadata'    
     - name: Install dependencies
       run: |
             docker run --rm -v ${{ github.workspace }}:/ws:rw --workdir=/ws \
             ${{ env.img }} \
             bash -exc '${{ env.py }} -m pip install virtualenv && ${{ env.py }} -m venv .env && \
             source .env/bin/activate && \
-            sudo yum install -y pkgconfig fuse fuse-devel && \
-            ./cargo clippy --all && \
-            ./cargo test --all --tests -- --nocapture && \
+            curl --proto ''=https'' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s --
+        -v -y --default-toolchain none && \
+            ./build-support/bin/release.sh -q && \
+            USE_PY38=true ./build-support/bin/release.sh -q && \
+            USE_PY39=true ./build-support/bin/release.sh -q && \
+            ./build-support/bin/release.sh -f && \
             deactivate'
-
-  manylinux-arm64:
-    name: "${{ matrix.PYTHON.ABI_VERSION }} manylinux2014-aarch64"
-    runs-on: ubuntu-latest
-    strategy:
-       matrix:
-        PYTHON:
-          - {VERSION: "cp36-cp36m", ABI_VERSION: 'cp36'}
-    steps:
-      - uses: actions/checkout@v2
-      - run: |
-          docker run --rm --privileged hypriot/qemu-register
-      - uses: docker://quay.io/pypa/manylinux2014_aarch64
-        # The weird pip cache nonsense below is due to docker ownership issues. We want
-        # a cache because otherwise we end up building cffi twice.
-        with:
-          args: |
-              bash -c "set -xe;
-              mkdir -p /github/home/.cache/pip;
-              chown -R $(whoami) /github/home/.cache;
-              /opt/python/${{ matrix.PYTHON.VERSION }}/bin/python -m venv .venv;
-              echo \"::set-output name=hash::$(./build-support/bin/rust/print_engine_hash.sh)\";
-              ./pants --version;
-              ./pants list ::;
-              ./pants roots;
-              ./pants help goals;
-              ./pants help targets;
-              ./pants help subsystems;"
-      - name: Upload pants.log
-        uses: actions/upload-artifact@v2
-        with:
-          name: pants-log-bootstrap-linux
-          path: .pants.d/pants.log
-      - name: Upload native_engine.so
-        uses: actions/upload-artifact@v2
-        with:
-          name: native_engine.so.${{ matrix.python-version }}.${{ runner.os }}
-          path: 'src/python/pants/engine/internals/native_engine.so
-            src/python/pants/engine/internals/native_engine.so.metadata'
-      - if: '!contains(env.COMMIT_MESSAGE, ''[ci skip-rust]'')'
-        name: Test and Lint Rust
-        run: 'sudo apt-get install -y pkg-config fuse libfuse-dev
-          ./cargo clippy --all
-          ./cargo test --all --tests -- --nocapture
-          '      
 
 name: Pull Request CI
 'on':
