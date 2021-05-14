@@ -254,9 +254,6 @@ jobs:
             #echo "PATH=${PATH}:${HOME}/.cargo/bin" >> ${GITHUB_ENV} && \
             export PATH=$HOME/.cargo/bin:${PATH} && \
             rustup --version && \
-            yum install -y autoconf && \
-            cargo clean && \
-            cargo build && \
             ./build-support/bin/release.sh -q RUST_BACKTRACE=1 && \
             USE_PY38=true ./build-support/bin/release.sh -q && \
             USE_PY39=true ./build-support/bin/release.sh -q && \
