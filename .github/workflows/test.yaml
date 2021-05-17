@@ -210,13 +210,16 @@ jobs:
         - '3.7'
     timeout-minutes: 40
   build_wheels_linux:
-    container: quay.io/pypa/manylinux2014_x86_64:latest
+    container: quay.io/pypa/manylinux2014_aarch64:latest
     env:
       PANTS_REMOTE_CACHE_READ: 'false'
       PANTS_REMOTE_CACHE_WRITE: 'false'
     name: Build wheels and fs_util (Linux)
     runs-on: ubuntu-20.04
     steps:
+    - name: Set up QEMU
+      id: qemu
+      uses: docker/setup-qemu-action@v1    
     - name: Check out code
       uses: actions/checkout@v2
       with:
