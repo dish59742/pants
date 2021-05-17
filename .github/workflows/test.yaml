@@ -101,7 +101,7 @@ jobs:
             ./build-support/bin/release.sh -f && \
             deactivate'
 
-name: Pull Request CI
-'on':
-- push
-- pull_request
+#name: Pull Request CI
+#'on':
+#- push
+#- pull_request
