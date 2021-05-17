@@ -413,7 +413,7 @@ def test_workflow_jobs(python_versions: list[str], *, cron: bool) -> Jobs:
                 "build_wheels_linux": {
                     "name": "Build wheels and fs_util (Linux)",
                     "runs-on": LINUX_VERSION,
-                    "container": "quay.io/pypa/manylinux2014_x86_64:latest",
+                    "container": "quay.io/pypa/manylinux2014_aarch64:latest",
                     "timeout-minutes": 65,
                     "env": DISABLE_REMOTE_CACHE_ENV,
                     "steps": [
