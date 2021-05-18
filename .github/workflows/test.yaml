@@ -92,9 +92,9 @@ jobs:
             bash -exc '${{ env.py }} -m pip install virtualenv && ${{ env.py }} -m venv .env && \
             source .env/bin/activate && \
             curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -v -y --default-toolchain none && \
-            #echo "PATH=${PATH}:${HOME}/.cargo/bin" >> ${GITHUB_ENV} && \
             export PATH=$HOME/.cargo/bin:${PATH} && \
             rustup --version && \
+            export PATH=$PATH:/opt/python/cp37-cp37m/bin:/opt/python/cp38-cp38/bin:/opt/python/cp39-cp39/bin
             export MODE=debug && \
             ./build-support/bin/release.sh -q RUST_BACKTRACE=1 && \
             USE_PY38=true ./build-support/bin/release.sh -q && \
