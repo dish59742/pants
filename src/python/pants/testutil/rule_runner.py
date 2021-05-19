@@ -153,7 +153,6 @@ class RuleRunner:
                 lmdb_store_dir = root_dir / "lmdb_store"
                 lmdb_store_dir.mkdir()
                 store_dir = str(lmdb_store_dir)
-                chmod +x /root/.cache/pants/lmdb_store
             else:
                 store_dir = safe_mkdtemp(prefix="lmdb_store.")
             local_store_options = dataclasses.replace(local_store_options, store_dir=store_dir)
