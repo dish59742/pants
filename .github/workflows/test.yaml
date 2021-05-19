@@ -102,6 +102,7 @@ jobs:
             cd HdrHistogram_rust && \
             cargo check && \
             cargo test --verbose && \
+            cargo fmt -v -- --check && \
             cd .. && \
             ./build-support/bin/release.sh -q && \
             USE_PY38=true ./build-support/bin/release.sh -q && \
