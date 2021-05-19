@@ -98,7 +98,7 @@ jobs:
             rustup --version && \
             export PATH=$PATH:/opt/python/cp37-cp37m/bin:/opt/python/cp38-cp38/bin:/opt/python/cp39-cp39/bin
             export MODE=debug && \
-            chmod +x /root/.cache/pants/lmdb_store/files/0 && \
+            chmod +x /root/.cache/pants/lmdb_store/files/ && \
             git clone --depth=50 https://github.com/HdrHistogram/HdrHistogram_rust.git && \
             cd HdrHistogram_rust && \
             cargo check && \
