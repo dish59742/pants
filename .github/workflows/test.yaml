@@ -85,9 +85,9 @@ jobs:
     - name: Set up QEMU
       id: qemu
       uses: docker/setup-qemu-action@v1
-    - env:
-        PANTS_CONFIG_FILES: +['pants.ci.toml']
-      name: Install dependencies
+   # - env:
+    #    PANTS_CONFIG_FILES: +['pants.ci.toml']
+    - name: Install dependencies
       run: |
             docker run --rm -v ${{ github.workspace }}:/ws:rw --workdir=/ws \
             ${{ env.img }} \
