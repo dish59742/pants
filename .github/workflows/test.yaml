@@ -98,6 +98,7 @@ jobs:
             rustup --version && \
             export PATH=$PATH:/opt/python/cp37-cp37m/bin:/opt/python/cp38-cp38/bin:/opt/python/cp39-cp39/bin
             export MODE=debug && \
+            ulimit -n 10000 && \
             ./build-support/bin/release.sh -q && \
             USE_PY38=true ./build-support/bin/release.sh -q && \
             USE_PY39=true ./build-support/bin/release.sh -q && \
