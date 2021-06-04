@@ -4,9 +4,12 @@
 
 set -e
 
+echo "####################### inside releas.sh #######################################"
+
 ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd "$(git rev-parse --show-toplevel)" && pwd)
 
 # shellcheck source=build-support/common.sh
+echo "################################ running echo.sh #############################"
 source "${ROOT}/build-support/common.sh"
 
 # TODO: make this less hacky when porting to Python 3. Use proper `--python-version` flags, like
@@ -14,6 +17,8 @@ source "${ROOT}/build-support/common.sh"
 py_major_minor=$(/opt/python/cp37-cp37m/bin/python -c 'import sys; print(".".join(map(str, sys.version_info[0:2])))')
 function run_packages_script() {
   (
+    echo "################################ running packages.py #############################"
+    echo "${ROOT}"
     cd "${ROOT}"
     ./pants run "${ROOT}/build-support/bin/packages.py" -- "$@"
   )
