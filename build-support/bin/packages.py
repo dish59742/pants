@@ -513,6 +513,7 @@ def build_fs_util() -> None:
     # See https://www.pantsbuild.org/docs/contributions-rust for a description of fs_util. We
     # include it in our releases because it can be a useful standalone tool.
     with travis_section("fs_util", "Building fs_util"):
+        print("#################################################### calling fs util ##################################")
         command = ["./cargo", "build", "-p", "fs_util"]
         release_mode = os.environ.get("MODE", "") != "debug"
         if release_mode:
