@@ -291,22 +291,27 @@ class _Constants:
 
     @property
     def deploy_3rdparty_wheel_dir(self) -> Path:
+        print("############################## inside deploy_3rdparty_wheel_dir_self ##########################")
         return self.deploy_dir / self.deploy_3rdparty_wheels_path
 
     @property
     def deploy_pants_wheel_dir(self) -> Path:
+        print("############################## inside deploy_pants_wheel_dir_self ##########################")
         return self.deploy_dir / self.deploy_pants_wheels_path
 
     @property
     def pants_unstable_version(self) -> str:
+        print("############################## inside pants_unstable_version_self ##########################")
         return f"{self.pants_stable_version}+git{self._head_sha[:8]}"
 
     @property
     def twine_venv_dir(self) -> Path:
+        print("############################## twine_venv_dir_self ##########################")
         return Path.cwd() / "build-support" / "twine-deps.venv"
 
     @property
     def python_version(self) -> str:
+        print("############################## python_version_self ##########################")
         return ".".join(map(str, sys.version_info[:2]))
 
 
@@ -364,6 +369,7 @@ def set_pants_version(version: str) -> Iterator[None]:
 
 
 def is_cross_platform(wheel_paths: Iterable[Path]) -> bool:
+    print("############################## is_cross_platform ##########################")
     return not all(wheel.name.endswith("-none-any.whl") for wheel in wheel_paths)
 
 
